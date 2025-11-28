@@ -25,3 +25,8 @@ dist-ssr
 
 # Firebase credentials
 **/firebase-service-account.json
+
+# Environment Variables
+.env
+backend/.env
+.env.local
