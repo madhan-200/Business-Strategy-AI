@@ -39,9 +39,7 @@ StratAI includes a complete authentication system with Firebase:
 - **Protected Routes**: Automatic redirection for unauthenticated users
 - **Sign-Out Functionality**: Secure logout with session cleanup
 
-### Sign-Out Demo
 
-![Sign-out demonstration](./signout_demo.webp)
 
 *Complete sign-out flow demonstration*
 
