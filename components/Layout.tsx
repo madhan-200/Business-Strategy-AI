@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppState, NavigationItem } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 import {
   LayoutDashboard,
   Target,
@@ -18,6 +19,15 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, businessName }) => {
+  const { logout } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Failed to sign out:', error);
+    }
+  };
   const navItems: { id: NavigationItem; label: string; icon: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: '🚀' },
     { id: 'strategy', label: 'Strategy Map', icon: '🗺️' },
@@ -84,7 +94,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTa
               <span className="text-xl">🏢</span>
             </p>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-red-500 transition-colors py-2 font-bold group">
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-red-500 transition-colors py-2 font-bold group"
+          >
             <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span>Sign Out</span>
           </button>

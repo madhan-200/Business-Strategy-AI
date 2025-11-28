@@ -30,6 +30,27 @@ StratAI is not just a dashboard; it's an **AGI-driven engine** that acts as a di
 
 ---
 
+## 🔐 Authentication Features
+
+StratAI includes a complete authentication system with Firebase:
+
+- **Email/Password Authentication**: Secure user registration and login
+- **Google OAuth**: One-click sign-in with Google accounts
+- **Protected Routes**: Automatic redirection for unauthenticated users
+- **Sign-Out Functionality**: Secure logout with session cleanup
+
+### Sign-Out Demo
+
+![Sign-out demonstration](./signout_demo.webp)
+
+*Complete sign-out flow demonstration*
+
+![Login page after sign-out](./signout_screenshot.png)
+
+*Users are redirected to the login page after signing out*
+
+---
+
 ## 🏗️ Tech Stack
 
 ### Frontend
@@ -188,7 +209,7 @@ See `backend/schema.sql` for complete schema.
 
 ## 🚧 Roadmap
 
-- [ ] User authentication (Firebase/Supabase)
+- [x] User authentication (Firebase)
 - [ ] PDF export functionality
 - [ ] Subscription/payment integration
 - [ ] Weekly auto-update cron jobs
