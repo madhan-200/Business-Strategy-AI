@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Mail, Lock, Chrome, ArrowRight, Sparkles } from 'lucide-react';
@@ -81,7 +82,7 @@ export const Signup: React.FC = () => {
                             <h1 className="text-5xl font-black bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
                                 StratAI
                             </h1>
-                            <p className="text-sm text-pink-200 font-medium">Your Success Partner 🤝</p>
+                            <p className="text-sm text-pink-200 font-medium">Powered By Madhan Magic ✨</p>
                         </div>
                     </div>
 
@@ -131,7 +132,7 @@ export const Signup: React.FC = () => {
 
                 {/* Right Side - Signup Form */}
                 <div className="flex items-center justify-center animate-slide-in-right">
-                    <div className="w-full max-w-md">
+                    <div className="w-full max-w-md mx-auto">
                         {/* Error Message */}
                         {error && (
                             <div className="mb-6 p-4 bg-red-400/90 backdrop-blur-sm rounded-2xl text-white text-sm font-semibold flex items-center gap-2 animate-shake-horizontal">
@@ -141,7 +142,7 @@ export const Signup: React.FC = () => {
                         )}
 
                         {/* Signup Card */}
-                        <div className="bg-white rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl transform hover:scale-105 transition-transform duration-300 max-w-full">
                             {/* Header */}
                             <div className="text-center mb-8">
                                 <div className="inline-block mb-4">
@@ -260,9 +261,9 @@ export const Signup: React.FC = () => {
                             {/* Login Link */}
                             <p className="mt-6 text-center text-gray-600 font-medium">
                                 Already a member?{' '}
-                                <a href="/login" className="text-pink-600 hover:text-purple-600 font-black transition-colors">
-                                    Sign In Here! 👋
-                                </a>
+                                <Link to="/login" className="text-pink-600 hover:text-purple-600 font-black transition-colors">
+                                    Sign In
+                                </Link>
                             </p>
                         </div>
                     </div>
