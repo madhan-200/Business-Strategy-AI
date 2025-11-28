@@ -40,9 +40,6 @@ StratAI includes a complete authentication system with Firebase:
 - **Sign-Out Functionality**: Secure logout with session cleanup
 
 
-
-*Complete sign-out flow demonstration*
-
 ![Login page after sign-out](./signout_screenshot.png)
 
 *Users are redirected to the login page after signing out*
