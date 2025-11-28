@@ -128,16 +128,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 This project is licensed under the MIT License.
-# From project root
-npm install
 
-# Create .env.local file
-cp .env.example .env.local
+## 👤 Author
 
-# Edit .env.local:
-# VITE_API_URL=http://localhost:5000
-
-# Start development server
+**MADHANKUMAR S**
+- 📧 Email: [madhankumars8012@gmail.com](mailto:madhankumars8012@gmail.com)
+- 🐙 GitHub: [@madhan-200](https://github.com/madhan-200)
 npm run dev
 ```
 
