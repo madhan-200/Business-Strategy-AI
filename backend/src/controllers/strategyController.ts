@@ -7,9 +7,38 @@ export const generateStrategy = async (req: Request, res: Response) => {
     try {
         const business: BusinessProfile = req.body;
 
-        if (!business.name || !business.industry) {
-            return res.status(400).json({ error: 'Missing required business fields' });
+        // Comprehensive validation for all required fields
+        const requiredFields = ['name', 'industry', 'niche', 'audience', 'goals', 'challenges'];
+        const missingFields: string[] = [];
+        const emptyFields: string[] = [];
+
+        for (const field of requiredFields) {
+            const value = business[field as keyof BusinessProfile];
+
+            if (!value) {
+                missingFields.push(field);
+            } else if (typeof value === 'string' && value.trim().length === 0) {
+                emptyFields.push(field);
+            }
         }
+
+        if (missingFields.length > 0 || emptyFields.length > 0) {
+            const errors: string[] = [];
+            if (missingFields.length > 0) {
+                errors.push(`Missing required fields: ${missingFields.join(', ')}`);
+            }
+            if (emptyFields.length > 0) {
+                errors.push(`Empty fields not allowed: ${emptyFields.join(', ')}`);
+            }
+
+            console.error('❌ Validation failed:', errors);
+            return res.status(400).json({
+                error: 'Validation failed',
+                details: errors
+            });
+        }
+
+        console.log('✅ Validation passed for business:', business.name);
 
         const strategy = await generateStrategyAI(business);
 
@@ -20,7 +49,7 @@ export const generateStrategy = async (req: Request, res: Response) => {
 
         res.json(strategy);
     } catch (error: any) {
-        console.error('Error in generateStrategy controller:', error);
+        console.error('❌ Error in generateStrategy controller:', error);
         res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
 };

@@ -31,9 +31,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ strategy, business }) => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Top Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Growth Score Card */}
         <div className="bg-white p-6 rounded-3xl shadow-xl shadow-blue-100 border border-blue-50 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-200 transition-all"></div>

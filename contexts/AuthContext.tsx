@@ -29,6 +29,34 @@ export const useAuth = () => {
     return context;
 };
 
+// Helper function to translate Firebase errors to user-friendly messages
+const getAuthErrorMessage = (error: any): string => {
+    const errorCode = error?.code || '';
+
+    switch (errorCode) {
+        case 'auth/unauthorized-domain':
+            return 'This domain is not authorized for Google Sign-In. Please contact support or use email/password login.';
+        case 'auth/popup-closed-by-user':
+            return 'Sign-in cancelled. Please try again.';
+        case 'auth/popup-blocked':
+            return 'Pop-up blocked by browser. Please allow pop-ups and try again.';
+        case 'auth/user-not-found':
+            return 'No account found with this email. Please sign up first.';
+        case 'auth/wrong-password':
+            return 'Incorrect password. Please try again.';
+        case 'auth/email-already-in-use':
+            return 'This email is already registered. Please login instead.';
+        case 'auth/weak-password':
+            return 'Password is too weak. Please use at least 6 characters.';
+        case 'auth/invalid-email':
+            return 'Invalid email address. Please check and try again.';
+        case 'auth/network-request-failed':
+            return 'Network error. Please check your internet connection.';
+        default:
+            return error?.message || 'An error occurred. Please try again.';
+    }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -43,16 +71,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const signup = async (email: string, password: string) => {
-        await createUserWithEmailAndPassword(auth, email, password);
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+        } catch (error: any) {
+            throw new Error(getAuthErrorMessage(error));
+        }
     };
 
     const login = async (email: string, password: string) => {
-        await signInWithEmailAndPassword(auth, email, password);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error: any) {
+            throw new Error(getAuthErrorMessage(error));
+        }
     };
 
     const loginWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+        } catch (error: any) {
+            console.error('Google Sign-In Error:', error);
+            throw new Error(getAuthErrorMessage(error));
+        }
     };
 
     const logout = async () => {

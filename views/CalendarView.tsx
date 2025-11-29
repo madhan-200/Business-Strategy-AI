@@ -7,6 +7,12 @@ interface CalendarViewProps {
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ strategy }) => {
+  const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
+
+  const toggleCard = (index: number) => {
+    setExpandedCard(expandedCard === index ? null : index);
+  };
+
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'twitter': return <Twitter size={20} />;
@@ -58,39 +64,57 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ strategy }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {strategy.contentCalendar.map((item, i) => (
-          <div key={i} className="bg-white border-2 border-gray-100 rounded-3xl p-6 hover:border-purple-300 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-bl-full -mr-4 -mt-4 opacity-50 group-hover:scale-110 transition-transform"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        {strategy.contentCalendar.map((item, i) => {
+          const isExpanded = expandedCard === i;
+          return (
+            <div
+              key={i}
+              onClick={() => toggleCard(i)}
+              className="bg-white border-2 border-gray-100 rounded-3xl p-6 hover:border-purple-300 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden cursor-pointer"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-bl-full -mr-4 -mt-4 opacity-50 group-hover:scale-110 transition-transform"></div>
 
-            <div className="flex justify-between items-start mb-4 relative z-10">
-              <span className="px-3 py-1 bg-gray-900 text-white text-xs font-black rounded-lg uppercase tracking-wider">
-                Day {item.day}
-              </span>
-              <div className={`p-2 rounded-xl bg-white shadow-md text-gray-600 group-hover:text-purple-600 group-hover:scale-110 transition-all`}>
-                {getPlatformIcon(item.platform)}
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <span className="px-3 py-1 bg-gray-900 text-white text-xs font-black rounded-lg uppercase tracking-wider">
+                  Day {item.day}
+                </span>
+                <div className={`p-2 rounded-xl bg-white shadow-md text-gray-600 group-hover:text-purple-600 group-hover:scale-110 transition-all`}>
+                  {getPlatformIcon(item.platform)}
+                </div>
               </div>
+
+              <h4 className={`text-gray-800 font-bold text-lg mb-3 leading-tight group-hover:text-purple-600 transition-colors ${isExpanded ? '' : 'line-clamp-2 min-h-[56px]'}`}>
+                {item.title}
+              </h4>
+
+              <p className={`text-gray-500 text-sm mb-6 leading-relaxed font-medium bg-gray-50 p-3 rounded-xl border border-gray-100 ${isExpanded ? '' : 'line-clamp-3'}`}>
+                {item.description}
+              </p>
+
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 relative z-10">
+                <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${getTypeColor(item.type)}`}>
+                  <span className="text-sm">{getTypeEmoji(item.type)}</span>
+                  {item.type}
+                </span>
+                <button
+                  className="text-gray-400 hover:text-green-500 transition-colors hover:scale-110 transform"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  {item.status === 'completed' ? <CheckCircle2 size={24} className="text-green-500" /> : <Clock size={24} />}
+                </button>
+              </div>
+
+              {isExpanded && (
+                <div className="mt-3 text-center text-xs text-purple-600 font-bold">
+                  Click to collapse ↑
+                </div>
+              )}
             </div>
-
-            <h4 className="text-gray-800 font-bold text-lg mb-3 line-clamp-2 min-h-[56px] leading-tight group-hover:text-purple-600 transition-colors">
-              {item.title}
-            </h4>
-
-            <p className="text-gray-500 text-sm mb-6 line-clamp-3 leading-relaxed font-medium bg-gray-50 p-3 rounded-xl border border-gray-100">
-              {item.description}
-            </p>
-
-            <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 relative z-10">
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${getTypeColor(item.type)}`}>
-                <span className="text-sm">{getTypeEmoji(item.type)}</span>
-                {item.type}
-              </span>
-              <button className="text-gray-400 hover:text-green-500 transition-colors hover:scale-110 transform">
-                {item.status === 'completed' ? <CheckCircle2 size={24} className="text-green-500" /> : <Clock size={24} />}
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Add New Placeholder */}
         <div className="border-3 border-dashed border-gray-200 rounded-3xl p-6 flex flex-col items-center justify-center text-gray-400 hover:text-purple-500 hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer min-h-[300px] group">

@@ -122,6 +122,7 @@ export const generateStrategyAI = async (business: BusinessProfile): Promise<Str
   `;
 
     try {
+        console.log('🤖 Calling Gemini API...');
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: prompt,
@@ -133,17 +134,73 @@ export const generateStrategyAI = async (business: BusinessProfile): Promise<Str
         });
 
         const text = response?.text;
-        if (!text) throw new Error("No response from AI");
+        console.log('📥 Raw response length:', text?.length || 0);
 
-        const data = JSON.parse(text);
+        if (!text) {
+            throw new Error("No response from AI");
+        }
 
+        // Validate response is not empty
+        if (text.trim().length === 0) {
+            throw new Error("Empty response from AI");
+        }
+
+        // Try to parse JSON with better error handling
+        let data;
+        try {
+            // Clean the response text (remove any potential BOM or invisible characters)
+            const cleanedText = text.trim().replace(/^\uFEFF/, '');
+            data = JSON.parse(cleanedText);
+            console.log('✅ JSON parsed successfully');
+        } catch (parseError: any) {
+            console.error('❌ JSON Parse Error:', parseError.message);
+            console.error('📄 Problematic text (first 500 chars):', text.substring(0, 500));
+            console.error('📄 Problematic text (last 500 chars):', text.substring(Math.max(0, text.length - 500)));
+
+            // Try to extract JSON from the response if it's wrapped in other text
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                console.log('🔧 Attempting to extract JSON from wrapped response...');
+                try {
+                    data = JSON.parse(jsonMatch[0]);
+                    console.log('✅ Extracted and parsed JSON successfully');
+                } catch (extractError) {
+                    throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
+                }
+            } else {
+                throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
+            }
+        }
+
+        // Validate required fields
+        if (!data.summary || !data.growthScore || !data.marketingChannels || !data.contentCalendar) {
+            console.error('❌ Missing required fields in AI response:', {
+                hasSummary: !!data.summary,
+                hasGrowthScore: !!data.growthScore,
+                hasMarketingChannels: !!data.marketingChannels,
+                hasContentCalendar: !!data.contentCalendar
+            });
+            throw new Error("AI response missing required fields");
+        }
+
+        console.log('✅ Strategy generated successfully');
         return {
             ...data,
             id: crypto.randomUUID(),
             generatedAt: new Date().toISOString()
         };
-    } catch (error) {
-        console.error("Error generating strategy:", error);
+    } catch (error: any) {
+        console.error("❌ Error generating strategy:", error);
+
+        // Provide more helpful error messages
+        if (error.message?.includes('API key')) {
+            throw new Error("Invalid or missing API key. Please check your GEMINI_API_KEY environment variable.");
+        } else if (error.message?.includes('parse')) {
+            throw new Error("Failed to process AI response. The AI returned malformed data. Please try again.");
+        } else if (error.message?.includes('quota')) {
+            throw new Error("API quota exceeded. Please try again later.");
+        }
+
         throw error;
     }
 };

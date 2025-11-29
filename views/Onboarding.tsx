@@ -17,17 +17,70 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
         goals: '',
         challenges: ''
     });
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+
+        // Clear error for this field when user starts typing
+        if (errors[name]) {
+            setErrors({ ...errors, [name]: '' });
+        }
     };
 
-    const nextStep = () => setStep(s => s + 1);
+    const validateStep = (): boolean => {
+        const newErrors: Record<string, string> = {};
+
+        if (step === 1) {
+            if (!formData.name.trim()) {
+                newErrors.name = 'Business name is required';
+            }
+            if (!formData.industry.trim()) {
+                newErrors.industry = 'Industry is required';
+            }
+            if (!formData.niche.trim()) {
+                newErrors.niche = 'Niche is required';
+            }
+        } else if (step === 2) {
+            if (!formData.audience.trim()) {
+                newErrors.audience = 'Target audience is required';
+            }
+            if (!formData.goals.trim()) {
+                newErrors.goals = 'Goals are required';
+            }
+        } else if (step === 3) {
+            if (!formData.challenges.trim()) {
+                newErrors.challenges = 'Challenges are required';
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const nextStep = () => {
+        if (validateStep()) {
+            setStep(s => s + 1);
+        }
+    };
+
     const prevStep = () => setStep(s => s - 1);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onComplete(formData);
+
+        if (validateStep()) {
+            // Final validation - check all fields
+            const allFieldsFilled = Object.values(formData).every(val => val.trim().length > 0);
+
+            if (!allFieldsFilled) {
+                setErrors({ submit: 'Please fill in all required fields' });
+                return;
+            }
+
+            onComplete(formData);
+        }
     };
 
     return (
@@ -68,8 +121,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                         {[1, 2, 3].map((s) => (
                             <div key={s} className="flex items-center gap-2">
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${step >= s
-                                        ? 'bg-white text-purple-600 shadow-lg scale-110'
-                                        : 'bg-white/30 text-white'
+                                    ? 'bg-white text-purple-600 shadow-lg scale-110'
+                                    : 'bg-white/30 text-white'
                                     }`}>
                                     {step > s ? '✓' : s}
                                 </div>
@@ -106,8 +159,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="e.g., Awesome Innovations"
-                                        className="w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-xl transition-all duration-300"
+                                        className={`w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:shadow-xl transition-all duration-300 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                     />
+                                    {errors.name && (
+                                        <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                            <span>❌</span> {errors.name}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Industry & Niche */}
@@ -123,8 +181,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                             value={formData.industry}
                                             onChange={handleChange}
                                             placeholder="e.g., Tech"
-                                            className="w-full px-5 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-lg transition-all duration-300"
+                                            className={`w-full px-5 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 font-semibold placeholder-gray-400 focus:outline-none focus:shadow-lg transition-all duration-300 ${errors.industry ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                         />
+                                        {errors.industry && (
+                                            <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                                <span>❌</span> {errors.industry}
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
@@ -137,8 +200,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                             value={formData.niche}
                                             onChange={handleChange}
                                             placeholder="e.g., SaaS"
-                                            className="w-full px-5 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-lg transition-all duration-300"
+                                            className={`w-full px-5 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 font-semibold placeholder-gray-400 focus:outline-none focus:shadow-lg transition-all duration-300 ${errors.niche ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                         />
+                                        {errors.niche && (
+                                            <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                                <span>❌</span> {errors.niche}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -158,8 +226,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                         value={formData.audience}
                                         onChange={handleChange}
                                         placeholder="e.g., Small business owners aged 30-50"
-                                        className="w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-xl transition-all duration-300"
+                                        className={`w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:shadow-xl transition-all duration-300 ${errors.audience ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                     />
+                                    {errors.audience && (
+                                        <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                            <span>❌</span> {errors.audience}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Goals */}
@@ -174,8 +247,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                         value={formData.goals}
                                         onChange={handleChange}
                                         placeholder="e.g., Double revenue in 12 months"
-                                        className="w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-xl transition-all duration-300"
+                                        className={`w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:shadow-xl transition-all duration-300 ${errors.goals ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                     />
+                                    {errors.goals && (
+                                        <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                            <span>❌</span> {errors.goals}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -195,8 +273,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, isLoading })
                                         onChange={handleChange}
                                         rows={6}
                                         placeholder="Tell us your biggest challenges... Be honest! 😊"
-                                        className="w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 border-purple-200 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:shadow-xl transition-all duration-300 resize-none"
+                                        className={`w-full px-6 py-5 bg-gradient-to-r from-purple-50 to-pink-50 border-3 rounded-2xl text-gray-800 text-lg font-semibold placeholder-gray-400 focus:outline-none focus:shadow-xl transition-all duration-300 resize-none ${errors.challenges ? 'border-red-500 focus:border-red-500' : 'border-purple-200 focus:border-purple-500'}`}
                                     />
+                                    {errors.challenges && (
+                                        <p className="mt-2 text-red-500 text-sm font-bold flex items-center gap-1">
+                                            <span>❌</span> {errors.challenges}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
